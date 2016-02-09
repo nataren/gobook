@@ -5,8 +5,14 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 )
 
 func main() {
-	fmt.Println(strings.Join(os.Args[1:], " "))
+	start := time.Now()
+	result := strings.Join(os.Args[1:], " ")
+	secs := time.Since(start).Seconds()
+	fmt.Printf("it took %E seconds\n", secs)
+
+	fmt.Println(result)
 }
