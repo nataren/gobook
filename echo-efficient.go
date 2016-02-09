@@ -5,14 +5,12 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
 )
 
-func main() {
-	start := time.Now()
-	result := strings.Join(os.Args[1:], " ")
-	secs := time.Since(start).Seconds()
-	fmt.Printf("it took %E seconds\n", secs)
+func echo(parts []string) string {
+	return strings.Join(os.Args[1:], " ")
+}
 
-	fmt.Println(result)
+func main() {
+	fmt.Println(echo(os.Args[1:]))
 }

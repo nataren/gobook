@@ -4,17 +4,17 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
 )
 
-func main() {
+func echo(parts []string) string {
 	var s, sep string
-	start := time.Now()
-	for i := 1; i < len(os.Args); i++ {
-		s += sep + os.Args[i]
+	for i := 0; i < len(parts); i++ {
+		s += sep + parts[i]
 		sep = " "
 	}
-	secs := time.Since(start).Seconds()
-	fmt.Printf("it took %E seconds\n", secs)
-	fmt.Println(s)
+	return s
+}
+
+func main() {
+	fmt.Println(echo(os.Args[1:]))
 }
