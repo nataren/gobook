@@ -19,16 +19,22 @@ func main() {
 			url = PREFIX + tentativeURL
 		}
 		resp, err := http.Get(url)
+		showStatus(resp)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "fetch: %v\n", err)
 			os.Exit(1)
 		}
-		copied, err := io.Copy(os.Stdout, resp.Body)
+		_, err = io.Copy(os.Stdout, resp.Body)
 		resp.Body.Close()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "fetch: reading %s: %v\n", url, err)
 			os.Exit(1)
 		}
-		fmt.Printf("%v bytes copied", copied)
+	}
+}
+
+func showStatus(resp *http.Response) {
+	if resp != nil {
+		fmt.Printf("\nstatus code: %v\n", resp.Status)
 	}
 }
