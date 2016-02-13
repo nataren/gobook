@@ -12,12 +12,7 @@ func main() {
 	const PREFIX = "http://"
 
 	for _, tentativeURL := range os.Args[1:] {
-		var url string
-		if strings.HasPrefix(tentativeURL, PREFIX) {
-			url = tentativeURL
-		} else {
-			url = PREFIX + tentativeURL
-		}
+		url := getURL(tentativeURL)
 		resp, err := http.Get(url)
 		showStatus(resp)
 		if err != nil {
@@ -37,4 +32,11 @@ func showStatus(resp *http.Response) {
 	if resp != nil {
 		fmt.Printf("\nstatus code: %v\n", resp.Status)
 	}
+}
+
+func getURL(tentativeURL string) string {
+	if strings.HasPrefix(tentativeURL, PREFIX) {
+		return tentativeURL
+	}
+	return PREFIX + tentativeURL
 }
