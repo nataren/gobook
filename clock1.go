@@ -7,10 +7,14 @@ import (
 	"log"
 	"net"
 	"time"
+	"flag"
+	"strconv"
 )
 
 func main() {
-	listener, err := net.Listen("tcp", "localhost:8000")
+	var port = flag.Int("port", 8010, "port where your clock will be listening to")
+	flag.Parse()
+	listener, err := net.Listen("tcp", "localhost:" + strconv.Itoa(*port))
 	if err != nil {
 		log.Fatal(err)
 	}
