@@ -8,6 +8,7 @@ import (
 	"io"
 	"sync"
 	"net"
+	"bufio"
 )
 
 type Clock struct {
@@ -32,8 +33,12 @@ func getClocks(args []string) []Clock {
 }
 
 func copy(dst io.Writer, src io.Reader, city string) {
-	if _, err := io.Copy(dst, src); err != nil {
-		log.Fatalf("error copying data to output stream: %v", err)
+	scanner := bufio.NewScanner(src)
+	for scanner.Scan() {
+		if err := scanner.Err(); err != nil {
+			continue
+		}
+		fmt.Fprintf(dst, fmt.Sprintf("\r%s: %v", city, scanner.Text()))
 	}
 }
 
