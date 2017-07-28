@@ -27,8 +27,10 @@ func main() {
 const (
 
 	// Ok
-	REPLY_SERVICE_READY  = 220
-	REPLY_USER_NAME_OKAY = 331
+	REPLY_SERVICE_READY_IN = 120
+	REPLY_SERVICE_READY    = 220
+	REPLY_USER_LOGGED_IN   = 230
+	REPLY_USER_NAME_OKAY   = 331
 
 	// Errors
 	REPLY_SYNTAX_ERROR = 500
@@ -99,6 +101,10 @@ func read(s string) Command {
 		return Command{
 			Code: CMD_USER,
 		}
+	case "PASS":
+		return Command{
+			Code: CMD_PASS,
+		}
 	default:
 		return Command{
 			Code:           CMD_UNKNOWN,
@@ -114,6 +120,11 @@ func eval(c Command) Reply {
 		return Reply{
 			Code:    REPLY_USER_NAME_OKAY,
 			Message: "User name okay, need password",
+		}
+	case CMD_PASS:
+		return Reply{
+			Code:    REPLY_USER_LOGGED_IN,
+			Message: "User logged in, proceed",
 		}
 	default:
 		return Reply{
@@ -131,8 +142,7 @@ func serverProcessInterpreter(c net.Conn) {
 	}.String())
 	scanner := bufio.NewScanner(c)
 	for scanner.Scan() {
-		text := scanner.Text()
-		io.WriteString(c, eval(read(text)).String())
+		io.WriteString(c, eval(read(scanner.Text())).String())
 		continue
 	}
 	err := scanner.Err()
