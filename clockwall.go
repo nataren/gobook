@@ -117,7 +117,14 @@ func main() {
 			}
 			sort.Sort(ByCity(citiesAndTimes))
 			for _, citytime := range citiesAndTimes {
-				messages = append(messages, citytime.String())
+				message := citytime.String()
+				if message == "" {
+					continue
+				}
+				messages = append(messages, message)
+			}
+			if len(messages) == 0 {
+				continue
 			}
 			fmt.Printf("\r| %s |", strings.Join(messages, " | "))
 			time.Sleep(999 * time.Millisecond)
