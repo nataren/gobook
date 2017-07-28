@@ -1,20 +1,21 @@
 package main
 
 import (
-	"os"
-	"strings"
+	"bufio"
 	"fmt"
 	"io"
-	"sync"
 	"net"
-	"bufio"
+	"os"
 	"sort"
+	"strings"
+	"sync"
+	"time"
 )
 
 type Clock struct {
-	City string
+	City         string
 	HostnamePort string
-	Output chan CityTime
+	Output       chan CityTime
 }
 
 func (c Clock) String() string {
@@ -48,10 +49,10 @@ func getClocks(args []string) []Clock {
 	clocks := make([]Clock, len(args))
 	for i, v := range args {
 		values := strings.SplitN(v, "=", 2)
-		clocks[i] = Clock {
-			City: values[0],
+		clocks[i] = Clock{
+			City:         values[0],
 			HostnamePort: values[1],
-			Output: make(chan CityTime),
+			Output:       make(chan CityTime),
 		}
 	}
 	return clocks
@@ -63,7 +64,7 @@ func readtime(src io.Reader, c Clock) {
 		if err := scanner.Err(); err != nil {
 			continue
 		}
-		c.Output <- CityTime {
+		c.Output <- CityTime{
 			City: c.City,
 			Time: scanner.Text(),
 		}
@@ -76,7 +77,7 @@ func main() {
 	for _, c := range clocks {
 		wg.Add(1)
 		clock := c
-		go func() {
+		go func(city string) {
 			var conn net.Conn
 
 			// Make sure to clean up after ourselves
@@ -93,29 +94,33 @@ func main() {
 				return
 			}
 			readtime(conn, clock)
-		}()
+		}(c.City)
 	}
 	cityTimes := make([]chan CityTime, len(clocks))
 	for i, clock := range clocks {
 		cityTimes[i] = clock.Output
 	}
-	
+
 	// Output to std output
 	go func(cityTimes []chan CityTime) {
 		wg.Add(1)
 		defer wg.Done()
-		length := len(cityTimes)
-		vals := make([]CityTime, length)
-		messages := make([]string, length)
 		for {
-			for i, citytime := range cityTimes {
-				vals[i] = <-citytime
+			var citiesAndTimes []CityTime
+			var messages []string
+			for _, citytime := range cityTimes {
+				select {
+				case v := <-citytime:
+					citiesAndTimes = append(citiesAndTimes, v)
+				default:
+				}
 			}
-			sort.Sort(ByCity(vals))
-			for i, citytime := range vals {
-				messages[i] = citytime.String()
+			sort.Sort(ByCity(citiesAndTimes))
+			for _, citytime := range citiesAndTimes {
+				messages = append(messages, citytime.String())
 			}
 			fmt.Printf("\r| %s |", strings.Join(messages, " | "))
+			time.Sleep(999 * time.Millisecond)
 		}
 	}(cityTimes)
 	wg.Wait()
