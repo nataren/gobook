@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"regexp"
+	"strings"
 )
 
 type Foo struct {
@@ -22,10 +23,16 @@ func (foo Foo) Bmethod(arg1, arg2 float32) {
 }
 
 func main() {
-	foo := Foo{field1: "my field"}
-	fmt.Println(foo)
 
 	// regex
-	validID := regexp.MustCompile(`foo[0-9]+`)
-	fmt.Println(validID.MatchString("foo1"))
+	queryArgs := regexp.MustCompile(`\w+=\w*`)
+	matches := queryArgs.FindAllString("https://contoso.com?a=b&foo=bar", 0)
+	if matches == nil {
+		fmt.Println("found no matches")
+		return
+	}
+	for _, m := range matches {
+		parts := strings.Split(m, "=")
+		fmt.Printf("%v->%v\n", parts[0], parts[1])
+	}
 }
