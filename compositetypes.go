@@ -26,13 +26,17 @@ func main() {
 
 	// regex
 	queryArgs := regexp.MustCompile(`\w+=\w*`)
-	matches := queryArgs.FindAllString("https://contoso.com?a=b&foo=bar", 0)
+	fmt.Printf("[FindString] %v\n", queryArgs.FindString("https://contoso.com?c=d&x=y"))
+
+	matches := queryArgs.FindAllString("https://contoso.com?a=b&foo=bar", -1)
 	if matches == nil {
 		fmt.Println("found no matches")
 		return
 	}
 	for _, m := range matches {
 		parts := strings.Split(m, "=")
-		fmt.Printf("%v->%v\n", parts[0], parts[1])
+		if len(parts) >= 2 {
+			fmt.Printf("[FindAllString] %v->%v\n", parts[0], parts[1])
+		}
 	}
 }
