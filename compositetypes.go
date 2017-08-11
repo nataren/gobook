@@ -25,18 +25,23 @@ func (foo Foo) Bmethod(arg1, arg2 float32) {
 func main() {
 
 	// regex
-	queryArgs := regexp.MustCompile(`\w+=\w*`)
+	queryArgs := regexp.MustCompile(`(?P<key>\w+=?P<value>\w*)`)
 	fmt.Printf("[FindString] %v\n", queryArgs.FindString("https://contoso.com?c=d&x=y"))
 
 	matches := queryArgs.FindAllString("https://contoso.com?a=b&foo=bar", -1)
-	if matches == nil {
-		fmt.Println("found no matches")
-		return
+	if matches != nil {
+		for _, m := range matches {
+			parts := strings.Split(m, "=")
+			if len(parts) >= 2 {
+				fmt.Printf("[FindAllString] %v->%v\n", parts[0], parts[1])
+			}
+		}
 	}
-	for _, m := range matches {
-		parts := strings.Split(m, "=")
-		if len(parts) >= 2 {
-			fmt.Printf("[FindAllString] %v->%v\n", parts[0], parts[1])
+
+	submatches := queryArgs.FindAllStringSubmatch("https://contoso.com?a=b&foo=bar", -1)
+	if submatches != nil {
+		for _, m := range submatches {
+			fmt.Println(m)
 		}
 	}
 }
