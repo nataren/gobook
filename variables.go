@@ -28,11 +28,16 @@ func main() {
 
 	f, err := os.Open("foo")
 
-	defer f.Close()
+	i := 1
+	myf := func(n int) {
+		fmt.Println("my func: ", n)
+	}
+	defer myf(i)
 
+	i += 1
 	fmt.Println(f, err)
-	f2, err := os.Create("foo")
-	fmt.Println(f2, err)
+	f, err = os.Create("foo")
+	fmt.Println(f, err)
 
-	defer f2.Close()
+	defer myf(i)
 }
