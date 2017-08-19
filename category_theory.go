@@ -11,6 +11,24 @@ func comp(
 	}
 }
 
+func memoize(f func(x interface{}) interface{}) func(x interface{}) interface{} {
+	m := make(map[interface{}]interface{})
+	return func(x interface{}) interface{} {
+		if k, ok := x.(int); ok {
+			if v, ok := m[k]; ok {
+				fmt.Println("retrieving for cache: ", k)
+				return v
+			} else {
+				fmt.Println("computing for: ", k)
+				v = f(k)
+				m[k] = v
+				return v
+			}
+		}
+		return nil
+	}
+}
+
 func main() {
 	add5 := comp(
 		func(n interface{}) interface{} {
@@ -27,4 +45,14 @@ func main() {
 		},
 	)
 	fmt.Println(add5(1) == 6)
+	mf := memoize(func(i interface{}) interface{} {
+		if n, ok := i.(int); ok {
+			return n + 5
+		}
+		return nil
+	})
+	fmt.Println(mf(1))
+	fmt.Println(mf(1))
+	fmt.Println(mf(1))
+	fmt.Println(mf(1))
 }
